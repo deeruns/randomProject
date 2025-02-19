@@ -1,14 +1,16 @@
 import "./Register.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { useContext } from "react";
 import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
-import { AuthToken, FakeData, User } from "tweeter-shared";
 import { Buffer } from "buffer";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthenticationFields from "../AuthenticationFields";
 import useInfo from "../../userInfo/userInfoHook";
+import {
+  RegisterPresenter,
+  RegisterView,
+} from "../../../presenter/RegisterPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -48,7 +50,7 @@ const Register = (props: Props) => {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    handleImageFile(file);
+    presenter.handleImageFile(file);
   };
 
   const handleImageFile = (file: File | undefined) => {
@@ -87,51 +89,53 @@ const Register = (props: Props) => {
     return file.name.split(".").pop();
   };
 
+  const listener: RegisterView = {
+    UpdateUserInfo: UpdateUserInfo,
+    navigate: () => useNavigate(),
+    displayErrorMessage: displayErrorMessage,
+    setImageUrl: setImageUrl,
+    //setImageBytes: setImageBytes,
+    setImageFileExtension: setImageFileExtension,
+  };
+
+  // do I need the useState thing??
+  const presenter = new RegisterPresenter(listener);
+
+  // probably move to a presenter??
   const doRegister = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-
-      UpdateUserInfo(user, user, authToken, rememberMe);
-      navigate("/");
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to register user because of exception: ${error}`
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    presenter.doRegister(
+      firstName,
+      lastName,
+      alias,
+      password,
+      imageBytes,
+      imageFileExtension,
+      rememberMe
+    );
   };
 
-  const register = async (
-    firstName: string,
-    lastName: string,
-    alias: string,
-    password: string,
-    userImageBytes: Uint8Array,
-    imageFileExtension: string
-  ): Promise<[User, AuthToken]> => {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
+  // fake data
+  // const register = async (
+  //   firstName: string,
+  //   lastName: string,
+  //   alias: string,
+  //   password: string,
+  //   userImageBytes: Uint8Array,
+  //   imageFileExtension: string
+  // ): Promise<[User, AuthToken]> => {
+  //   // Not neded now, but will be needed when you make the request to the server in milestone 3
+  //   const imageStringBase64: string =
+  //     Buffer.from(userImageBytes).toString("base64");
 
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+  //   // TODO: Replace with the result of calling the server
+  //   const user = FakeData.instance.firstUser;
 
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
+  //   if (user === null) {
+  //     throw new Error("Invalid registration");
+  //   }
 
-    return [user, FakeData.instance.authToken];
-  };
+  //   return [user, FakeData.instance.authToken];
+  // };
 
   const inputFieldGenerator = () => {
     return (
@@ -161,11 +165,13 @@ const Register = (props: Props) => {
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
         <>
-          <AuthenticationFields originalUrl={props.originalUrl} 
+          <AuthenticationFields
+            originalUrl={props.originalUrl}
             onEnterFunc={registerOnEnter}
-            setAlias={(event) => setAlias(event.target.value)} 
-            setPassword={(event) => setPassword(event.target.value)}/> 
-          </>
+            setAlias={(event) => setAlias(event.target.value)}
+            setPassword={(event) => setPassword(event.target.value)}
+          />
+        </>
         <div className="form-floating mb-3">
           <input
             type="file"
@@ -199,7 +205,15 @@ const Register = (props: Props) => {
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
-      submit={doRegister}
+      submit={presenter.doRegister(
+        firstName,
+        lastName,
+        alias,
+        password,
+        imageBytes,
+        imageFileExtension,
+        rememberMe
+      )}
     />
   );
 };

@@ -10,11 +10,10 @@ interface Props {
   setRememberMe: (value: boolean) => void;
   submitButtonDisabled: () => boolean;
   isLoading: boolean;
-  submit: () => void;
+  submit: () => Promise<void>;
 }
 
 const AuthenticationFormLayout = (props: Props) => {
-  
   return (
     <div className={props.isLoading ? "loading" : ""}>
       <div className="center">
@@ -34,7 +33,7 @@ const AuthenticationFormLayout = (props: Props) => {
             <h1 className="h4 mb-3 fw-normal">Or</h1>
             <h1 className="h5 mb-3 fw-normal">{props.oAuthHeading}</h1>
 
-            <OAuth/>
+            <OAuth />
 
             <div className="checkbox mb-3">
               <label>

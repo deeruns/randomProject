@@ -1,14 +1,12 @@
 import "./Login.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { useContext } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
-import { AuthToken, FakeData, User } from "tweeter-shared";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthenticationFields from "../AuthenticationFields";
 import useInfo from "../../userInfo/userInfoHook";
-
+import { LoginPresenter, LoginView } from "../../../presenter/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -30,54 +28,67 @@ const Login = (props: Props) => {
 
   const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      doLogin();
+      presenter.doLogin(alias, password, rememberMe, props.originalUrl);
     }
   };
 
-  const doLogin = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await login(alias, password);
-
-      UpdateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate("/");
-      }
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const listener: LoginView = {
+    UpdateUserInfo: UpdateUserInfo,
+    navigate: () => useNavigate(),
+    displayErrorMessage: displayErrorMessage,
   };
 
-  const login = async (
-    alias: string,
-    password: string
-  ): Promise<[User, AuthToken]> => {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+  // do I need the useState thing??
+  const presenter = new LoginPresenter(listener);
 
-    if (user === null) {
-      throw new Error("Invalid alias or password");
-    }
+  // to the presenter
+  // const doLogin = async () => {
+  //   try {
+  //     setIsLoading(true);
 
-    return [user, FakeData.instance.authToken];
-  };
+  //     const [user, authToken] = await login(alias, password);
+
+  //     UpdateUserInfo(user, user, authToken, rememberMe);
+
+  //     if (!!props.originalUrl) {
+  //       navigate(props.originalUrl);
+  //     } else {
+  //       navigate("/");
+  //     }
+  //   } catch (error) {
+  //     displayErrorMessage(
+  //       `Failed to log user in because of exception: ${error}`
+  //     );
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // to the service
+  // const login = async (
+  //   alias: string,
+  //   password: string
+  // ): Promise<[User, AuthToken]> => {
+  //   // TODO: Replace with the result of calling the server
+  //   const user = FakeData.instance.firstUser;
+
+  //   if (user === null) {
+  //     throw new Error("Invalid alias or password");
+  //   }
+
+  //   return [user, FakeData.instance.authToken];
+  // };
 
   const inputFieldGenerator = () => {
     return (
       <>
-          <AuthenticationFields originalUrl={props.originalUrl} 
-            onEnterFunc={loginOnEnter}
-            setAlias={(event) => setAlias(event.target.value)} 
-            setPassword={(event) => setPassword(event.target.value)}/> 
-          </>
+        <AuthenticationFields
+          originalUrl={props.originalUrl}
+          onEnterFunc={loginOnEnter}
+          setAlias={(event) => setAlias(event.target.value)}
+          setPassword={(event) => setPassword(event.target.value)}
+        />
+      </>
     );
   };
 
@@ -90,7 +101,7 @@ const Login = (props: Props) => {
   };
 
   return (
-    <AuthenticationFormLayout
+    <AuthenticationFormLayout // changed something in here
       headingText="Please Sign In"
       submitButtonLabel="Sign in"
       oAuthHeading="Sign in with:"
@@ -99,7 +110,7 @@ const Login = (props: Props) => {
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
-      submit={doLogin}
+      submit={presenter.doLogin(alias, password, rememberMe, props.originalUrl)}
     />
   );
 };
