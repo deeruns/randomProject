@@ -1,26 +1,23 @@
-import { NavigateFunction } from "react-router-dom";
-import { UserService } from "../model/UserService";
 import { User, AuthToken } from "tweeter-shared";
+import { UserService } from "../model/UserService";
 
-export interface LoginView {
-  UpdateUserInfo: (
+export interface loginView {
+  updateUserInfo: (
     currentUser: User,
     displayedUser: User | null,
     authToken: AuthToken,
     remember: boolean
   ) => void;
-  // make sure import is correct
-  navigate: NavigateFunction;
+  navigate: (url: string) => void;
   displayErrorMessage: (message: string) => void;
 }
 
-export class LoginPresenter {
-  private _view: LoginView;
+export class loginPresenter {
   private userService: UserService;
-  private isLoading: boolean = false;
+  private view: loginView;
 
-  public constructor(view: LoginView) {
-    this._view = view;
+  constructor(view: loginView) {
+    this.view = view;
     this.userService = new UserService();
   }
 
@@ -28,26 +25,23 @@ export class LoginPresenter {
     alias: string,
     password: string,
     rememberMe: boolean,
-    originalUrl?: string
+    originalUrl: string | undefined
   ) {
     try {
-      this.isLoading = true;
-
       const [user, authToken] = await this.userService.login(alias, password);
 
-      this._view.UpdateUserInfo(user, user, authToken, rememberMe);
+      this.view.updateUserInfo(user, user, authToken, rememberMe);
 
-      if (!!originalUrl) {
-        this._view.navigate(originalUrl);
+      if (originalUrl) {
+        this.view.navigate(originalUrl);
       } else {
-        this._view.navigate("/");
+        this.view.navigate("/");
       }
     } catch (error) {
-      this._view.displayErrorMessage(
+      this.view.displayErrorMessage(
         `Failed to log user in because of exception: ${error}`
       );
     } finally {
-      this.isLoading = false;
     }
   }
 }

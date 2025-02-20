@@ -6,7 +6,7 @@ import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthenticationFields from "../AuthenticationFields";
 import useInfo from "../../userInfo/userInfoHook";
-import { LoginPresenter, LoginView } from "../../../presenter/LoginPresenter";
+import { loginPresenter, loginView } from "../../../presenter/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -26,58 +26,24 @@ const Login = (props: Props) => {
     return !alias || !password;
   };
 
-  const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      presenter.doLogin(alias, password, rememberMe, props.originalUrl);
-    }
-  };
-
-  const listener: LoginView = {
-    UpdateUserInfo: UpdateUserInfo,
-    navigate: () => useNavigate(),
+  const listener: loginView = {
+    updateUserInfo: UpdateUserInfo,
+    navigate: navigate,
     displayErrorMessage: displayErrorMessage,
   };
 
-  // do I need the useState thing??
-  const presenter = new LoginPresenter(listener);
+  const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key == "Enter" && !checkSubmitButtonStatus()) {
+      doLogin();
+    }
+  };
+  const [presenter] = useState(new loginPresenter(listener));
 
-  // to the presenter
-  // const doLogin = async () => {
-  //   try {
-  //     setIsLoading(true);
-
-  //     const [user, authToken] = await login(alias, password);
-
-  //     UpdateUserInfo(user, user, authToken, rememberMe);
-
-  //     if (!!props.originalUrl) {
-  //       navigate(props.originalUrl);
-  //     } else {
-  //       navigate("/");
-  //     }
-  //   } catch (error) {
-  //     displayErrorMessage(
-  //       `Failed to log user in because of exception: ${error}`
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // to the service
-  // const login = async (
-  //   alias: string,
-  //   password: string
-  // ): Promise<[User, AuthToken]> => {
-  //   // TODO: Replace with the result of calling the server
-  //   const user = FakeData.instance.firstUser;
-
-  //   if (user === null) {
-  //     throw new Error("Invalid alias or password");
-  //   }
-
-  //   return [user, FakeData.instance.authToken];
-  // };
+  const doLogin = async () => {
+    setIsLoading(true);
+    presenter.doLogin(alias, password, rememberMe, props.originalUrl);
+    setIsLoading(false);
+  };
 
   const inputFieldGenerator = () => {
     return (
@@ -101,7 +67,7 @@ const Login = (props: Props) => {
   };
 
   return (
-    <AuthenticationFormLayout // changed something in here
+    <AuthenticationFormLayout
       headingText="Please Sign In"
       submitButtonLabel="Sign in"
       oAuthHeading="Sign in with:"
@@ -109,8 +75,8 @@ const Login = (props: Props) => {
       switchAuthenticationMethodGenerator={switchAuthenticationMethodGenerator}
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
-      isLoading={isLoading}
-      submit={presenter.doLogin(alias, password, rememberMe, props.originalUrl)}
+      isLoading={isLoading} // can this be in the presenter?
+      submit={doLogin}
     />
   );
 };

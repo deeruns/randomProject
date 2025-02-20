@@ -10,7 +10,7 @@ interface Props {
   setRememberMe: (value: boolean) => void;
   submitButtonDisabled: () => boolean;
   isLoading: boolean;
-  submit: () => Promise<void>;
+  submit: () => void;
 }
 
 const AuthenticationFormLayout = (props: Props) => {

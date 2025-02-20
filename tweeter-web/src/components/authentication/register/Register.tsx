@@ -195,6 +195,18 @@ const Register = (props: Props) => {
     );
   };
 
+  const submitFunction = () => {
+    presenter.doRegister(
+      firstName,
+      lastName,
+      alias,
+      password,
+      imageBytes,
+      imageFileExtension,
+      rememberMe
+    );
+  };
+
   return (
     <AuthenticationFormLayout
       headingText="Please Register"
@@ -205,15 +217,7 @@ const Register = (props: Props) => {
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
-      submit={presenter.doRegister(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension,
-        rememberMe
-      )}
+      submit={submitFunction}
     />
   );
 };
