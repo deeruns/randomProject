@@ -1,4 +1,5 @@
 import { AuthToken, FakeData, User } from "tweeter-shared";
+import { Buffer } from "buffer";
 
 export class UserService {
   // put the stuff in here that uses fake data and will eventually contact the server to send or recieve data

@@ -9,10 +9,10 @@ import {
 } from "../../presenter/UserInfoPresenter";
 
 const UserInfo = () => {
-  // const [isFollower] = useState(false);
-  // const [followeeCount] = useState(-1);
-  // const [followerCount] = useState(-1);
-  // const [isLoading] = useState(false);
+  const [isFollower, setIsFollower] = useState(false);
+  const [followeeCount, setFolloweeCount] = useState(-1);
+  const [followerCount, setFollowerCount] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
     useToastListener();
@@ -31,8 +31,11 @@ const UserInfo = () => {
   }, [DisplayedUser]);
 
   const listener: UserInfoView = {
-    displayInfoMessage: displayInfoMessage,
+    setIsFollower: setIsFollower,
+    setFolloweeCount: setFolloweeCount,
+    setFollowerCount: setFollowerCount,
     displayErrorMessage: displayErrorMessage,
+    displayInfoMessage: displayInfoMessage,
     clearLastInfoMessage: clearLastInfoMessage,
     // do I need this??
     //SetDisplayedUser: SetDisplayedUser
@@ -40,7 +43,7 @@ const UserInfo = () => {
 
   // do I need it like this??
   //const [presenter] = useState(props.presenterGenerator(listener));
-  const presenter: UserInfoPresenter = new UserInfoPresenter(listener);
+  const [presenter] = useState(new UserInfoPresenter(listener));
 
   //presenter
   // const setIsFollowerStatus = async (
@@ -128,7 +131,7 @@ const UserInfo = () => {
   };
 
   //presenter
-  // const followDisplayedUser = async (
+  // const followDisplayedUser= async (
   //   event: React.MouseEvent
   // ): Promise<void> => {
   //   event.preventDefault();
@@ -173,7 +176,7 @@ const UserInfo = () => {
   // };
 
   // presenter
-  // const unfollowDisplayedUser = async (
+  // const unfollowDisplayedUser= async (
   //   event: React.MouseEvent
   // ): Promise<void> => {
   //   event.preventDefault();
@@ -217,8 +220,26 @@ const UserInfo = () => {
   //   return [followerCount, followeeCount];
   // };
 
+  const followDisplayedUser = async (
+    event: React.MouseEvent
+  ): Promise<void> => {
+    event.preventDefault();
+    setIsLoading(true);
+    presenter.followDisplayedUser(event, userAuthToken!, DisplayedUser!);
+    setIsLoading(false);
+  };
+
+  const unfollowDisplayedUser = async (
+    event: React.MouseEvent
+  ): Promise<void> => {
+    event.preventDefault();
+    setIsLoading(true);
+    presenter.unfollowDisplayedUser(event, userAuthToken!, DisplayedUser!);
+    setIsLoading(false);
+  };
+
   return (
-    <div className={presenter.isLoading ? "loading" : ""}>
+    <div className={isLoading ? "loading" : ""}>
       {CurrentUser === null ||
       DisplayedUser === null ||
       userAuthToken === null ? (
@@ -247,35 +268,28 @@ const UserInfo = () => {
                 </p>
               )}
               <h2>
-                <b>{DisplayedUser.name}</b>
+                <b>{DisplayedUser!.name}</b>
               </h2>
-              <h3>{DisplayedUser.alias}</h3>
+              <h3>{DisplayedUser!.alias}</h3>
               <br />
-              {presenter.followeeCount > -1 && presenter.followerCount > -1 && (
+              {followeeCount > -1 && followerCount > -1 && (
                 <div>
-                  Followees: {presenter.followeeCount} Followers:{" "}
-                  {presenter.followerCount}
+                  Followees: {followeeCount} Followers: {followerCount}
                 </div>
               )}
             </div>
             <form>
               {DisplayedUser !== CurrentUser && (
                 <div className="form-group">
-                  {presenter.isFollower ? (
+                  {isFollower ? (
                     <button
                       id="unFollowButton"
                       className="btn btn-md btn-secondary me-1"
                       type="submit"
                       style={{ width: "6em" }}
-                      onClick={(event) =>
-                        presenter.unfollowDisplayedUser(
-                          event,
-                          userAuthToken,
-                          DisplayedUser
-                        )
-                      }
+                      onClick={(event) => unfollowDisplayedUser(event)}
                     >
-                      {presenter.isLoading ? (
+                      {isLoading ? (
                         <span
                           className="spinner-border spinner-border-sm"
                           role="status"
@@ -291,15 +305,9 @@ const UserInfo = () => {
                       className="btn btn-md btn-primary me-1"
                       type="submit"
                       style={{ width: "6em" }}
-                      onClick={(event) =>
-                        presenter.followDisplayedUser(
-                          event,
-                          userAuthToken,
-                          DisplayedUser
-                        )
-                      }
+                      onClick={(event) => followDisplayedUser(event)}
                     >
-                      {presenter.isLoading ? (
+                      {isLoading ? (
                         <span
                           className="spinner-border spinner-border-sm"
                           role="status"

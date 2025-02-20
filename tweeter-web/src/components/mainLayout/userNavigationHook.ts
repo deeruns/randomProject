@@ -20,7 +20,7 @@ export function useUser() {
 
   // did I do this right
   // const [presenter] = useState(props.presenterGenerator(listener));
-  const presenter = new UserNavigationPresenter(listener);
+  const [presenter] = useState(new UserNavigationPresenter(listener));
 
   // move to USERNAVPRESENTER
   const navigateToUser = async (event: React.MouseEvent): Promise<void> => {

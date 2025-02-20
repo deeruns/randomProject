@@ -2,6 +2,9 @@ import { AuthToken, User } from "tweeter-shared";
 import { FollowService } from "../model/FollowService";
 
 export interface UserInfoView {
+  setIsFollower: (value: boolean) => void;
+  setFolloweeCount: (newCount: number) => void;
+  setFollowerCount: (newCount: number) => void;
   displayErrorMessage: (message: string) => void;
   displayInfoMessage: (
     message: string,
@@ -16,9 +19,6 @@ export class UserInfoPresenter {
   private _view: UserInfoView;
   private followService: FollowService;
   private _isLoading: boolean = false;
-  private _isFollower: boolean = false;
-  private _followerCount: number = -1;
-  private _followeeCount: number = -1;
 
   public constructor(view: UserInfoView) {
     this._view = view;
@@ -41,9 +41,9 @@ export class UserInfoPresenter {
         DisplayedUser!
       );
 
-      this._isFollower = false;
-      this._followerCount = followerCount;
-      this._followeeCount = followeeCount;
+      this._view.setIsFollower(false);
+      this._view.setFollowerCount(followerCount);
+      this._view.setFolloweeCount(followeeCount);
     } catch (error) {
       this._view.displayErrorMessage(
         `Failed to unfollow user because of exception: ${error}`
@@ -70,9 +70,9 @@ export class UserInfoPresenter {
         DisplayedUser!
       );
 
-      this._isFollower = true;
-      this._followerCount = followerCount;
-      this._followeeCount = followeeCount;
+      this._view.setIsFollower(true);
+      this._view.setFollowerCount(followerCount);
+      this._view.setFolloweeCount(followeeCount);
     } catch (error) {
       this._view.displayErrorMessage(
         `Failed to follow user because of exception: ${error}`
@@ -90,12 +90,14 @@ export class UserInfoPresenter {
   ) => {
     try {
       if (currentUser === displayedUser) {
-        this._isFollower = false;
+        this._view.setIsFollower(false);
       } else {
-        this._isFollower = await this.followService.getIsFollowerStatus(
-          authToken!,
-          currentUser!,
-          displayedUser!
+        this._view.setIsFollower(
+          await this.followService.getIsFollowerStatus(
+            authToken!,
+            currentUser!,
+            displayedUser!
+          )
         );
       }
     } catch (error) {
@@ -107,9 +109,8 @@ export class UserInfoPresenter {
 
   setNumbFollowees = async (authToken: AuthToken, displayedUser: User) => {
     try {
-      this._followeeCount = await this.followService.getFolloweeCount(
-        authToken,
-        displayedUser
+      this._view.setFolloweeCount(
+        await this.followService.getFolloweeCount(authToken, displayedUser)
       );
     } catch (error) {
       this._view.displayErrorMessage(
@@ -120,9 +121,8 @@ export class UserInfoPresenter {
 
   setNumbFollowers = async (authToken: AuthToken, displayedUser: User) => {
     try {
-      this._followerCount = await this.followService.getFollowerCount(
-        authToken,
-        displayedUser
+      this._view.setFollowerCount(
+        await this.followService.getFollowerCount(authToken, displayedUser)
       );
     } catch (error) {
       this._view.displayErrorMessage(
@@ -136,19 +136,19 @@ export class UserInfoPresenter {
   //     this._view.SetDisplayedUser(CurrentUser!);
   //   };
 
-  public get followerCount() {
-    return this._followerCount;
-  }
+  // public get followerCount() {
+  //   return this._followerCount;
+  // }
 
-  public get followeeCount() {
-    return this._followeeCount;
-  }
+  // public get followeeCount() {
+  //   return this._followeeCount;
+  // }
 
-  public get isLoading() {
-    return this._isLoading;
-  }
+  // public get isLoading() {
+  //   return this._isLoading;
+  // }
 
-  public get isFollower() {
-    return this._isFollower;
-  }
+  // public get isFollower() {
+  //   return this._isFollower;
+  // }
 }

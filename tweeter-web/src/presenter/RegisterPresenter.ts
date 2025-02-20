@@ -1,29 +1,41 @@
 import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../model/UserService";
 import { NavigateFunction } from "react-router-dom";
+import { Buffer } from "buffer";
 
 export interface RegisterView {
-  // maybe the import is wrong??
+  // // maybe the import is wrong??
+  // UpdateUserInfo: (
+  //   currentUser: User,
+  //   displayedUser: User | null,
+  //   authToken: AuthToken,
+  //   remember: boolean
+  // ) => void;
+  // navigate: NavigateFunction;
+  // displayErrorMessage: (message: string) => void;
+  // setImageUrl: React.Dispatch<React.SetStateAction<string>>;
+  // // setImageBytes: (
+  // //   value: React.SetStateAction<Uint8Array<ArrayBufferLike>>
+  // // ) => void;
+  // setImageFileExtension: React.Dispatch<React.SetStateAction<string>>;
+  navigate: (url: string) => void;
   UpdateUserInfo: (
     currentUser: User,
     displayedUser: User | null,
     authToken: AuthToken,
     remember: boolean
   ) => void;
-  navigate: NavigateFunction;
   displayErrorMessage: (message: string) => void;
-  setImageUrl: React.Dispatch<React.SetStateAction<string>>;
-  // setImageBytes: (
-  //   value: React.SetStateAction<Uint8Array<ArrayBufferLike>>
-  // ) => void;
-  setImageFileExtension: React.Dispatch<React.SetStateAction<string>>;
+  setImageUrl: (newUrl: string) => void;
+  setImageBytes: (newBytes: Uint8Array) => void;
+  setImageFileExtension: (newExtension: string) => void;
 }
 
 export class RegisterPresenter {
   private _view: RegisterView;
   private userService: UserService;
-  private setIsLoading: boolean = false;
-  private imageBytes: Uint8Array = new Uint8Array();
+  //private setIsLoading: boolean = false;
+  //private imageBytes: Uint8Array = new Uint8Array();
 
   public constructor(view: RegisterView) {
     this._view = view;
@@ -31,16 +43,16 @@ export class RegisterPresenter {
   }
 
   public async doRegister(
-    firstName: any,
-    lastName: any,
-    alias: any,
-    password: any,
-    imageBytes: any,
-    imageFileExtension: any,
-    rememberMe: any
+    firstName: string,
+    lastName: string,
+    alias: string,
+    password: string,
+    imageBytes: Uint8Array,
+    imageFileExtension: string,
+    rememberMe: boolean
   ) {
     try {
-      this.setIsLoading = true;
+      //this.setIsLoading = true;
 
       const [user, authToken] = await this.userService.register(
         firstName,
@@ -50,7 +62,6 @@ export class RegisterPresenter {
         imageBytes,
         imageFileExtension
       );
-
       this._view.UpdateUserInfo(user, user, authToken, rememberMe);
       this._view.navigate("/");
     } catch (error) {
@@ -58,7 +69,7 @@ export class RegisterPresenter {
         `Failed to register user because of exception: ${error}`
       );
     } finally {
-      this.setIsLoading = false;
+      //this.setIsLoading = false;
     }
   }
 
@@ -74,12 +85,18 @@ export class RegisterPresenter {
         const imageStringBase64BufferContents =
           imageStringBase64.split("base64,")[1];
 
-        const bytes: Uint8Array = Buffer.from(
-          imageStringBase64BufferContents,
-          "base64"
-        );
+        // const bytes: Uint8Array = Buffer.from(
+        //   imageStringBase64BufferContents,
+        //   "base64"
+        // );
 
-        this.imageBytes = bytes;
+        const binaryString = atob(imageStringBase64BufferContents);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        this._view.setImageBytes(bytes);
       };
       reader.readAsDataURL(file);
 
@@ -90,7 +107,7 @@ export class RegisterPresenter {
       }
     } else {
       this._view.setImageUrl("");
-      this.imageBytes = new Uint8Array();
+      this._view.setImageBytes(new Uint8Array());
     }
   }
 
