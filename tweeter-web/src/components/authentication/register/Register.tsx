@@ -98,7 +98,7 @@ const Register = (props: Props) => {
   };
 
   // do I need the useState thing??
-  const presenter = new RegisterPresenter(listener);
+  const [presenter] = useState(new RegisterPresenter(listener));
 
   // probably move to a presenter??
   const doRegister = async () => {

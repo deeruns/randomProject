@@ -4,20 +4,6 @@ import { NavigateFunction } from "react-router-dom";
 import { Buffer } from "buffer";
 
 export interface RegisterView {
-  // // maybe the import is wrong??
-  // UpdateUserInfo: (
-  //   currentUser: User,
-  //   displayedUser: User | null,
-  //   authToken: AuthToken,
-  //   remember: boolean
-  // ) => void;
-  // navigate: NavigateFunction;
-  // displayErrorMessage: (message: string) => void;
-  // setImageUrl: React.Dispatch<React.SetStateAction<string>>;
-  // // setImageBytes: (
-  // //   value: React.SetStateAction<Uint8Array<ArrayBufferLike>>
-  // // ) => void;
-  // setImageFileExtension: React.Dispatch<React.SetStateAction<string>>;
   navigate: (url: string) => void;
   UpdateUserInfo: (
     currentUser: User,
@@ -85,6 +71,7 @@ export class RegisterPresenter {
         const imageStringBase64BufferContents =
           imageStringBase64.split("base64,")[1];
 
+        // original code
         // const bytes: Uint8Array = Buffer.from(
         //   imageStringBase64BufferContents,
         //   "base64"

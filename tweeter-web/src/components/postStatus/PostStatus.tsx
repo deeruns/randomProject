@@ -35,6 +35,7 @@ const PostStatus = () => {
     }
   };
 
+  // move to MVP
   const postStatus = async (
     authToken: AuthToken,
     newStatus: Status
