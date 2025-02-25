@@ -3,6 +3,11 @@ import { useState } from "react";
 import { AuthToken, Status } from "tweeter-shared";
 import useToastListener from "../toaster/ToastListenerHook";
 import useInfo from "../userInfo/userInfoHook";
+import {
+  PostStatusPresenter,
+  PostStatusView,
+} from "../../presenter/PostStatusPresenter";
+import { register } from "module";
 
 const PostStatus = () => {
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
@@ -12,39 +17,31 @@ const PostStatus = () => {
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const listener: PostStatusView = {
+    displayErrorMessage: displayErrorMessage,
+    displayInfoMessage: displayInfoMessage,
+    clearLastInfoMessage: clearLastInfoMessage,
+    setPost: setPost,
+  };
+
+  const [presenter] = useState(new PostStatusPresenter(listener));
+
   const submitPost = async (event: React.MouseEvent) => {
-    event.preventDefault();
-
-    try {
-      setIsLoading(true);
-      displayInfoMessage("Posting status...", 0);
-
-      const status = new Status(post, CurrentUser!, Date.now());
-
-      await postStatus(userAuthToken!, status);
-
-      setPost("");
-      displayInfoMessage("Status posted!", 2000);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
-    } finally {
-      clearLastInfoMessage();
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    presenter.submitPost(event, CurrentUser!, userAuthToken!, post);
+    setIsLoading(false);
   };
 
   // move to MVP
-  const postStatus = async (
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void> => {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+  // const postStatus = async (
+  //   authToken: AuthToken,
+  //   newStatus: Status
+  // ): Promise<void> => {
+  //   // Pause so we can see the logging out message. Remove when connected to the server
+  //   await new Promise((f) => setTimeout(f, 2000));
 
-    // TODO: Call the server to post the status
-  };
+  //   // TODO: Call the server to post the status
+  // };
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();

@@ -14,8 +14,8 @@ export class FollowerPresenter extends UserItemPresenter {
   }
 
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
-    try {
-      // this is the loadmorefollowees that we took out of app and put into service
+    //M2B
+    this.doFailureReportingOperation(async () => {
       const [newItems, hasMore] = await this.followService.loadMoreFollowers(
         authToken!,
         userAlias,
@@ -28,10 +28,6 @@ export class FollowerPresenter extends UserItemPresenter {
       // notify the scroller that there are more items to add
       // ad something in the view
       this.view.addItems(newItems);
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to load followers because of exception: ${error}`
-      );
-    }
+    }, "load followers");
   }
 }
