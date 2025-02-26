@@ -1,48 +1,49 @@
-import { AuthToken, User } from "tweeter-shared";
-import { UserService } from "../model/UserService";
+// apparently I do not need this
 
-export interface PostView {
-  displayErrorMessage: (message: string) => void;
-  SetDisplayedUser: (user: User) => void;
-}
+// import { AuthToken, User } from "tweeter-shared";
+// import { UserService } from "../model/UserService";
+// import { Presenter, View } from "./Presenter";
 
-export class PostPresenter {
-  private _view: PostView;
-  private userService: UserService;
+// export interface PostView extends View {
+//   SetDisplayedUser: (user: User) => void;
+// }
 
-  public constructor(view: PostView) {
-    this._view = view;
-    this.userService = new UserService();
-  }
+// export class PostPresenter extends Presenter<PostView> {
+//   private userService: UserService;
 
-  public async navigateToUser(
-    event: React.MouseEvent,
-    userAuthToken: AuthToken | null,
-    CurrentUser: User | null
-  ): Promise<void> {
-    event.preventDefault();
+//   public constructor(view: PostView) {
+//     super(view);
+//     this.userService = new UserService();
+//   }
 
-    try {
-      const alias = this.extractAlias(event.target.toString());
+//   public async navigateToUser(
+//     event: React.MouseEvent,
+//     userAuthToken: AuthToken | null,
+//     CurrentUser: User | null
+//   ): Promise<void> {
+//     event.preventDefault();
 
-      const user = await this.userService.getUser(userAuthToken!, alias);
+//     try {
+//       const alias = this.extractAlias(event.target.toString());
 
-      if (!!user) {
-        if (CurrentUser!.equals(user)) {
-          this._view.SetDisplayedUser(CurrentUser!);
-        } else {
-          this._view.SetDisplayedUser(user);
-        }
-      }
-    } catch (error) {
-      this._view.displayErrorMessage(
-        `Failed to get user because of exception: ${error}`
-      );
-    }
-  }
+//       const user = await this.userService.getUser(userAuthToken!, alias);
 
-  public extractAlias(value: string): string {
-    const index = value.indexOf("@");
-    return value.substring(index);
-  }
-}
+//       if (!!user) {
+//         if (CurrentUser!.equals(user)) {
+//           this.view.SetDisplayedUser(CurrentUser!);
+//         } else {
+//           this.view.SetDisplayedUser(user);
+//         }
+//       }
+//     } catch (error) {
+//       this.view.displayErrorMessage(
+//         `Failed to get user because of exception: ${error}`
+//       );
+//     }
+//   }
+
+//   public extractAlias(value: string): string {
+//     const index = value.indexOf("@");
+//     return value.substring(index);
+//   }
+// }

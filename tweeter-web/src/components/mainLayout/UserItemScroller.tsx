@@ -16,6 +16,7 @@ export const PAGE_SIZE = 10;
 interface Props {
   // M2A this function will create the presenter instance
   presenterGenerator: (view: UserItemView) => UserItemPresenter;
+  //itemComponentGenerator: (item: Status | User) => // what do I put here?
 }
 
 const UserItemScroller = (props: Props) => {

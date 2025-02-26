@@ -12,14 +12,32 @@ export interface MessageView extends View {
   clearLastInfoMessage: () => void;
 }
 
-export class Presenter {
-  private _view: View;
+export class Presenter<V extends View> {
+  private _view: V;
 
-  public constructor(view: View) {
+  public constructor(view: V) {
     this._view = view;
   }
 
-  protected get view() {
+  protected get view(): V {
     return this._view;
+  }
+
+  // this was instead of loadmoreitems...
+  public async doFailureReportingOperation(
+    operation: () => Promise<void>,
+    operationDescription: string
+  ) {
+    try {
+      await operation();
+    } catch (error) {
+      this.view.displayErrorMessage(
+        `Failed to ${operationDescription} because of exception: ${error}`
+      );
+    }
+  }
+
+  public async doNavigationOperation(operation: () => void) {
+    operation();
   }
 }

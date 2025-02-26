@@ -1,45 +1,19 @@
-import { moveRemove } from "rimraf";
-import { AuthToken, Status } from "tweeter-shared";
+import { Status } from "tweeter-shared";
+import { View } from "./Presenter";
+import { PagedItemPresenter } from "./PagedItemPresenter";
+import { StatusService } from "../model/StatusService";
 
-export interface StatusItemView {
+export interface StatusItemView extends View {
   addItems: (newItems: Status[]) => void;
-  displayErrorMessage: (message: string) => void;
+  // displayErrorMessage: (message: string) => void;
 }
 
 // this is just a parent class for the feed and story?
-export abstract class StatusItemPresenter {
-  private _hasMoreItems = true;
-  private _lastItem: Status | null = null;
-  private _view: StatusItemView;
-
-  protected constructor(view: StatusItemView) {
-    this._view = view;
+export abstract class StatusItemPresenter extends PagedItemPresenter<
+  Status,
+  StatusService
+> {
+  protected createService(): StatusService {
+    return new StatusService();
   }
-
-  protected get view() {
-    return this._view;
-  }
-
-  public get hasMoreItems() {
-    return this._hasMoreItems;
-  }
-
-  protected set hasMoreItems(hasMoreItems: boolean) {
-    this._hasMoreItems = hasMoreItems;
-  }
-
-  protected get lastItem() {
-    return this._lastItem;
-  }
-
-  protected set lastItem(lastItem: Status | null) {
-    this._lastItem = lastItem;
-  }
-
-  reset() {
-    this.lastItem = null;
-    this.hasMoreItems = true;
-  }
-
-  public abstract loadMoreItems(authToken: AuthToken, userAlias: string): void;
 }
