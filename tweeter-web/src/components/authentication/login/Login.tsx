@@ -27,7 +27,7 @@ const Login = (props: Props) => {
   };
 
   const listener: loginView = {
-    updateUserInfo: UpdateUserInfo,
+    UpdateUserInfo: UpdateUserInfo,
     navigate: navigate,
     displayErrorMessage: displayErrorMessage,
   };

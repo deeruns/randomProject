@@ -1,31 +1,12 @@
-import { AuthToken, User } from "tweeter-shared";
-import { UserService } from "../model/UserService";
-import { Presenter, View } from "./Presenter";
+import { AuthView, AuthPresenter } from "./AuthPresenter";
 
-//change the view and make more in presenter
-export interface RegisterView extends View {
-  navigate: (url: string) => void;
-  UpdateUserInfo: (
-    currentUser: User,
-    displayedUser: User | null,
-    authToken: AuthToken,
-    remember: boolean
-  ) => void;
-  displayErrorMessage: (message: string) => void;
+export interface RegisterView extends AuthView {
   setImageUrl: (newUrl: string) => void;
   setImageBytes: (newBytes: Uint8Array) => void;
   setImageFileExtension: (newExtension: string) => void;
 }
 
-export class RegisterPresenter extends Presenter<RegisterView> {
-  //private _view: RegisterView;
-  private userService: UserService;
-
-  public constructor(view: RegisterView) {
-    super(view);
-    this.userService = new UserService();
-  }
-
+export class RegisterPresenter extends AuthPresenter<RegisterView> {
   public async doRegister(
     firstName: string,
     lastName: string,
@@ -35,20 +16,23 @@ export class RegisterPresenter extends Presenter<RegisterView> {
     imageFileExtension: string,
     rememberMe: boolean
   ) {
-    this.doFailureReportingOperation(async () => {
-      const [user, authToken] = await this.userService.register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-      this.view.UpdateUserInfo(user, user, authToken, rememberMe);
-      this.doNavigationOperation(() => {
-        this.view.navigate("/");
-      });
-    }, "register user");
+    this.doAuthenticationOperation(
+      async () => {
+        return await this.service.register(
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension
+        );
+      },
+      "register user",
+      rememberMe
+    );
+    this.doNavigationOperation(() => {
+      this.view.navigate("/");
+    });
   }
 
   public handleImageFile(file: File | undefined) {

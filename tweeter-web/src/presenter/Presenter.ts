@@ -23,6 +23,10 @@ export class Presenter<V extends View> {
     return this._view;
   }
 
+  protected set view(view: V) {
+    this._view = view;
+  }
+
   // this was instead of loadmoreitems...
   public async doFailureReportingOperation(
     operation: () => Promise<void>,
