@@ -1,0 +1,20 @@
+BUCKET='cs340milestone3'
+LAMBDA_ROLE='arn:aws:iam::043309358119:role/cs340Milestone3'
+EDIT_LAMBDALIST='
+tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
+tweeterGetFollowers | lambda/follow/GetFollowersLambda.handler
+'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:043309358119:layer:tweeterLambdaLayer:3'
+
+
+# lamda list: what you want your lambda to be named | path to the handler (lambda code)
+#if dependencies change, then you need to rezip the file and make a new version
+
+#every time you update the labmdas or the layers you need to rerun the update layers and upload lambdas script
+#Updatelayers AFTER upload lambdas
+# uploadlambdas first
+#if you ever change something in shared module, or install someting, change layer version and run update layers
+
+#basically take our server classes and put them in the server module (copy them over)
+
+#zip contents of dist folder
