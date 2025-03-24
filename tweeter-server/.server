@@ -3,8 +3,20 @@ LAMBDA_ROLE='arn:aws:iam::043309358119:role/cs340Milestone3'
 EDIT_LAMBDALIST='
 tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
 tweeterGetFollowers | lambda/follow/GetFollowersLambda.handler
+followLambda | lambda/follow/FollowLambda.handler
+getFollowerCountLambda | lambda/follow/GetFollowerCountLambda.handler
+getFolloweeCountLambda | lambda/follow/GetFolloweeCountLambda.handler
+getFollowStatusLambda | lambda/follow/GetFollowStatusLambda.handler
+unfollowLambda | lambda/follow/UnfollowLambda.handler
+loadFeedItems | lambda/status/LoadFeedItems.handler
+loadStoryItems | lambda/status/LoadStoryItemsLambda.handler
+postStatusLambda | lambda/status/PostStatusLambda.handler
+getUserLambda | lambda/user/GetUserLambda.handler
+loginLambda | lambda/user/LoginLambda.handler
+logoutLambda | lambda/user/LogoutLambda.handler
+registerLambda | lambda/user/RegisterLambda.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:043309358119:layer:tweeterLambdaLayer:3'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:043309358119:layer:tweeterLambdaLayer:5'
 
 
 # lamda list: what you want your lambda to be named | path to the handler (lambda code)

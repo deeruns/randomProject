@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 const FollowService_1 = require("../../model/service/FollowService");
+//remove duplication with calls to functions
 const handler = async (request) => {
     //get the request data
     //call load more followees?
